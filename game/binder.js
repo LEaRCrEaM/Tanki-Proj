@@ -3,7 +3,7 @@ import { config } from '../utils/config.js'
 import { utils } from '../utils/utils.js'
 import { eventListeners, setEventListeners, removeEventListeners } from './eventListeners.js';
 
-addEventListeners();
+setEventListeners();
 var animationFrameId;
 function animationFrameFunc() {
     animationFrameId = requestAnimationFrame(animationFrameFunc);
@@ -474,7 +474,7 @@ function removeEventListeners() {
     });
 };
 
-addEventListeners();
+setEventListeners();
 var animationFrameId;
 function animationFrameFunc() {
     animationFrameId = requestAnimationFrame(animationFrameFunc);
