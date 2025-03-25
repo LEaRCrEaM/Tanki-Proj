@@ -19,3 +19,17 @@ var eventListeners = [
         }
     }
 ];
+
+function setEventListeners() {
+    eventListeners.forEach(listener => {
+        document.addEventListener(listener.type, listener.handle);
+    });
+};
+
+function removeEventListeners() {
+    eventListeners.forEach(listener => {
+        document.removeEventListener(listener.type, listener.handle);
+    });
+};
+
+export { eventListeners, setEventListeners, removeEventListeners };
