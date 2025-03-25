@@ -362,7 +362,7 @@ var utils = {
         return window.mapBounds;
     },
     get allTanks() {
-        if (!Utils.cameraComponent) return;
+        if (!Utils && !Utils.cameraComponent) return;
         var t = Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Utils.cameraComponent, '==15'))[0], '==65'))[0], '==21'))[0], '==18'))[0])[0];
         for (let i=0;i<t.length;i++) {
             t[i].espInfo = Object.values(functions.searchInObject(Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(t[i], '==15'))[0], '==18'))[0])[0], '==2'))[0]
