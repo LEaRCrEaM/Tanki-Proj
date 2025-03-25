@@ -64,7 +64,7 @@ var functions = {
         myTankInfo[1].j1b_1 = quaternion.w;
         return quaternion;
     },
-    updateTankOrientationToCamera: function () {
+    updateTankOrientationToCamera: function (myTankInfo) {
         const cameraYaw = functions.getCamYaw();
         const adjustedYaw = cameraYaw;
         const halfYaw = adjustedYaw * 0.5;
@@ -171,9 +171,6 @@ var binderFuncs = {
             console.log('error in params of binderFuncs.airBreak');
             return;
         };
-        myTankInfo[0].c18_1 = 0;
-        myTankInfo[0].d18_1 = 0;
-        myTankInfo[0].e18_1 = 0;
         if (config.hacks.airBreak.type == 'tilt') {
             myTankPos.c18_1 = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x));
             myTankPos.d18_1 = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y));
@@ -182,7 +179,7 @@ var binderFuncs = {
         if (config.hacks.airBreak.faceTarget && otherTankPos) {
             functions.faceTargetQuaternion(myTankPos, otherTankPos, myTankInfo);
         } else {
-            updateTankOrientationToCamera();
+            functions.updateTankOrientationToCamera(utils.tankInfo);
         };
         const cameraYaw = -functions.getCamYaw();
         const forwardX = Math.sin(cameraYaw);
@@ -190,8 +187,8 @@ var binderFuncs = {
         if (!functions.isChatOpen() && !config.hacks.spectate.enabled) {
             if (config.keysPressed.includes('w')) {
                 if (config.hacks.airBreak.type == 'tilt') {
-                    config.hacks.airBreak.tank.position.x += forwardX * config.hacks.airBreak.speed;
-                    config.hacks.airBreak.tank.position.y += forwardZ * config.hacks.airBreak.speed;
+                    config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x + forwardX * config.hacks.airBreak.speed));
+                    config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y + forwardZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
                     myTankInfo[0].c18_1 += forwardX * 1000;
                     myTankInfo[0].d18_1 += forwardZ * 1000;
@@ -199,8 +196,8 @@ var binderFuncs = {
             }
             if (config.keysPressed.includes('s')) {
                 if (config.hacks.airBreak.type == 'tilt') {
-                    config.hacks.airBreak.tank.position.x -= forwardX * config.hacks.airBreak.speed;
-                    config.hacks.airBreak.tank.position.y -= forwardZ * config.hacks.airBreak.speed;
+                    config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x - forwardX * config.hacks.airBreak.speed));
+                    config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y - forwardZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
                     myTankInfo[0].c18_1 -= forwardX * 1000;
                     myTankInfo[0].d18_1 -= forwardZ * 1000;
@@ -210,8 +207,8 @@ var binderFuncs = {
             const rightZ = -Math.sin(cameraYaw);
             if (config.keysPressed.includes('d')) {
                 if (config.hacks.airBreak.type == 'tilt') {
-                    config.hacks.airBreak.tank.position.x += rightX * config.hacks.airBreak.speed;
-                    config.hacks.airBreak.tank.position.y += rightZ * config.hacks.airBreak.speed;
+                    config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x + rightX * config.hacks.airBreak.speed));
+                    config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y + rightZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
                     myTankInfo[0].c18_1 += rightX * 1000;
                     myTankInfo[0].d18_1 += rightZ * 1000;
@@ -219,18 +216,18 @@ var binderFuncs = {
             };
             if (config.keysPressed.includes('a')) {
                 if (config.hacks.airBreak.type == 'tilt') {
-                    config.hacks.airBreak.tank.position.x -= rightX * config.hacks.airBreak.speed;
-                    config.hacks.airBreak.tank.position.y -= rightZ * config.hacks.airBreak.speed;
+                    config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x - rightX * config.hacks.airBreak.speed));
+                    config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y - rightZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
                     myTankInfo[0].c18_1 -= rightX * 1000;
                     myTankInfo[0].d18_1 -= rightZ * 1000;
                 };
             };
             if (config.keysPressed.includes('f')) {
-                config.hacks.airBreak.tank.position.z += config.hacks.airBreak.speed;
+                config.hacks.airBreak.tank.position.z = Math.max(Object.values(mapBounds)[2], Math.min(Object.values(mapBounds)[5] + 100, config.hacks.airBreak.tank.position.z + config.hacks.airBreak.speed));
             };
             if (config.keysPressed.includes('v')) {
-                config.hacks.airBreak.tank.position.z -= config.hacks.airBreak.speed;
+                config.hacks.airBreak.tank.position.z = Math.max(Object.values(mapBounds)[2], Math.min(Object.values(mapBounds)[5] + 100, config.hacks.airBreak.tank.position.z - config.hacks.airBreak.speed));
             };
         };
     }
@@ -376,22 +373,28 @@ var utils = {
         return Utils.tankPhysicsComponent;
     },
     get tankPosition() {
-        return functions.getPositionOfTank(functions.getTanks('self')[0]);
+        return functions.getPositionOfTank(utils.tank);
+    },
+    get tank() {
+        return functions.getTanks('self')[0];
     },
     get interpolatedTankPosition() {
         return functions.getIntPosOfTank(myTank);
     },
     get tankPositionVelocity() {
-        return functions.getInfoOfTank(functions.getTanks('self')[0])[0];
+        return utils.tankInfo[0];
     },
     get tankQuaternions() {
-        return functions.getInfoOfTank(functions.getTanks('self')[0])[1];
+        return utils.tankInfo[1];
     },
     get shells() {
         return Object.entries(Object.values(functions.searchInObject(Utils.gunParamsCalculator, '==19'))[0]).filter(t => typeof t[1] == 'object')[0][1];
     },
     get tankOrientationVelocity() {
-        return functions.getInfoOfTank(functions.getTanks('self')[0])[2];
+        return utils.tankInfo[2];
+    },
+    get tankInfo() {
+        return functions.getInfoOfTank(utils.tank);
     },
     get camera() {
         return Utils.followCamera;
@@ -435,6 +438,12 @@ var utils = {
     set turretDirection(t) {
         return Utils.turret[utils.turretDirectionName] = t;
     },
+    get tankMoveableVar() {
+        return Object.entries(utils.tank).filter(t => typeof t[1] == 'boolean')[0][0];
+    },
+    get tankMoveable() {
+        return utils.tank[utils.tankMoveableVar];
+    },
     getTurretDirectionOfTank: function (t) {
         return Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.entries(Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(t.espInfo, '==15'))[0], '==18'))[0])[0]).filter(t => t[1]?.m12z_1)[0][1], '==14'))[0], '==19'))[1])[1][0][utils.turretDirectionName];
     },
@@ -447,17 +456,22 @@ var eventListeners = [
     {
         type: 'keydown',
         handle: function(e) {
+            if (!config.keysPressed.includes(e.key)) config.keysPressed.push(e.key);
             if (e.shiftKey && e.location == 2) {
-                if (!config.hacks.airBreak.tank.position.x || !config.hacks.airBreak.tank.position.y || !config.hacks.airBreak.tank.position.z) {
-                    var pos = utils.tankPosition;
-                    config.hacks.airBreak.tank.position = {
-                        x: pos.c18_1,
-                        y: pos.d18_1,
-                        z: pos.e18_1,
-                    };
+                var pos = utils.tankPosition;
+                config.hacks.airBreak.tank.position = {
+                    x: pos.c18_1,
+                    y: pos.d18_1,
+                    z: pos.e18_1,
                 };
                 config.hacks.airBreak.enabled = !config.hacks.airBreak.enabled;
             };
+        }
+    },
+    {
+        type: 'keyup',
+        handle: function(e) {
+            if (config.keysPressed.includes(e.key)) config.keysPressed = config.keysPressed.filter(t => t !== e.key);
         }
     }
 ];
@@ -479,7 +493,10 @@ var animationFrameId;
 function animationFrameFunc() {
     animationFrameId = requestAnimationFrame(animationFrameFunc);
     if (config.hacks.airBreak.enabled) {
-        binderFuncs.airBreak(utils.tankPosition, functions.getInfoOfTank(functions.getTanks('self')[0]), utils.mapBounds, config.target.position);
+        if (utils.tankMoveable) utils.tank[utils.tankMoveableVar] = false;
+        binderFuncs.airBreak(utils.tankPosition, utils.tankInfo, utils.mapBounds, config.target.position);
+    } else {
+        if (!utils.tankMoveable) utils.tank[utils.tankMoveableVar] = true;
     };
 };
 try {
