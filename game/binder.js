@@ -66,20 +66,35 @@ var functions = {
     },
     updateTankOrientationToCamera: function (myTankInfo) {
         const cameraYaw = functions.getCamYaw();
-        const adjustedYaw = cameraYaw;
-        const halfYaw = adjustedYaw * 0.5;
+        const pitchAngle = -Math.PI / 12 * (utils.cameraElavation * 5);
+        const halfYaw = cameraYaw * 0.5;
+        const halfPitch = pitchAngle * 0.5;
         const sinYaw = Math.sin(halfYaw);
         const cosYaw = Math.cos(halfYaw);
+        const sinPitch = Math.sin(halfPitch);
+        const cosPitch = Math.cos(halfPitch);
         const yawQuat = {
             g1b_1: cosYaw,
             h1b_1: 0,
             i1b_1: 0,
             j1b_1: sinYaw
         };
-        myTankInfo[1].g1b_1 = yawQuat.g1b_1;
-        myTankInfo[1].h1b_1 = yawQuat.h1b_1;
-        myTankInfo[1].i1b_1 = yawQuat.i1b_1;
-        myTankInfo[1].j1b_1 = yawQuat.j1b_1;
+        const pitchQuat = {
+            g1b_1: cosPitch,
+            h1b_1: sinPitch,
+            i1b_1: 0,
+            j1b_1: 0
+        };
+        const resultQuat = {
+            g1b_1: yawQuat.g1b_1 * pitchQuat.g1b_1 - yawQuat.h1b_1 * pitchQuat.h1b_1 - yawQuat.i1b_1 * pitchQuat.i1b_1 - yawQuat.j1b_1 * pitchQuat.j1b_1,
+            h1b_1: yawQuat.g1b_1 * pitchQuat.h1b_1 + yawQuat.h1b_1 * pitchQuat.g1b_1 + yawQuat.i1b_1 * pitchQuat.j1b_1 - yawQuat.j1b_1 * pitchQuat.i1b_1,
+            i1b_1: yawQuat.g1b_1 * pitchQuat.i1b_1 - yawQuat.h1b_1 * pitchQuat.j1b_1 + yawQuat.i1b_1 * pitchQuat.g1b_1 + yawQuat.j1b_1 * pitchQuat.h1b_1,
+            j1b_1: yawQuat.g1b_1 * pitchQuat.j1b_1 + yawQuat.h1b_1 * pitchQuat.i1b_1 - yawQuat.i1b_1 * pitchQuat.h1b_1 + yawQuat.j1b_1 * pitchQuat.g1b_1
+        };
+        myTankInfo[1].g1b_1 = resultQuat.g1b_1;
+        myTankInfo[1].h1b_1 = resultQuat.h1b_1;
+        myTankInfo[1].i1b_1 = resultQuat.i1b_1;
+        myTankInfo[1].j1b_1 = resultQuat.j1b_1;
     },
     searchInObject: function (objectToSearch, comparisonString) {
         try {
@@ -146,6 +161,14 @@ var functions = {
             });
         } else {
             return;
+        };
+    },
+    resetVelocity: function() {
+        for (const k in t = utils.tankOrientationVelocity) {
+            (typeof t[k] == 'number') && (t[k] = 0);
+        };
+        for (const k in t = utils.tankPositionVelocity) {
+            (typeof t[k] == 'number') && (t[k] = 0);
         };
     },
     getPositionOfTank: function (t) {
@@ -362,7 +385,7 @@ var utils = {
         return window.mapBounds;
     },
     get allTanks() {
-        if (!Utils && !Utils.cameraComponent) return;
+        if (!Utils.cameraComponent) return;
         var t = Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Utils.cameraComponent, '==15'))[0], '==65'))[0], '==21'))[0], '==18'))[0])[0];
         for (let i=0;i<t.length;i++) {
             t[i].espInfo = Object.values(functions.searchInObject(Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(t[i], '==15'))[0], '==18'))[0])[0], '==2'))[0]
@@ -465,6 +488,7 @@ var eventListeners = [
                     z: pos.e18_1,
                 };
                 config.hacks.airBreak.enabled = !config.hacks.airBreak.enabled;
+                if (!config.hacks.airBreak.enabled) functions.resetVelocity();
             };
         }
     },
@@ -472,6 +496,15 @@ var eventListeners = [
         type: 'keyup',
         handle: function(e) {
             if (config.keysPressed.includes(e.key)) config.keysPressed = config.keysPressed.filter(t => t !== e.key);
+        }
+    },
+    {
+        type: 'mousemove',
+        handle: function(e) {
+            if (document.pointerLockElement && config.hacks.airBreak.enabled) {
+                var sensitivity = 0.0005;
+                utils.cameraElavation -= -e.movementY * sensitivity;
+            };
         }
     }
 ];
@@ -492,7 +525,7 @@ setEventListeners();
 var animationFrameId;
 function animationFrameFunc() {
     animationFrameId = requestAnimationFrame(animationFrameFunc);
-    if (config.hacks.airBreak.enabled) {
+    if (config.hacks.airBreak.enabled && Utils.cameraComponent) {
         if (utils.tankMoveable) utils.tank[utils.tankMoveableVar] = false;
         binderFuncs.airBreak(utils.tankPosition, utils.tankInfo, utils.mapBounds, config.target.position);
     } else {
@@ -504,4 +537,8 @@ try {
 } catch (e) {
     console.log('error in animationFrame', e);
     cancelAnimationFrame(animationFrameId);
+};
+
+function getTanks(t) {
+    return functions.getTanks(t);
 };
