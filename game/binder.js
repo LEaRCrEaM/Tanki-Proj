@@ -163,6 +163,28 @@ var functions = {
             return;
         };
     },
+    setSpec: function() {
+        utils.tank[utils.tankMoveableVar] = false;
+        if (Object.values(config.hacks.spectate.camera.originalFuncStorage).length == 0) {
+            functions.saveCameraFuncs();
+        };
+        for (const k in t = utils.specCamera) {
+            if (typeof t[k] == 'function') {
+                t[k] = function() {};
+            };
+        };
+    },
+    resetSpec: function() {
+        utils.tank[utils.tankMoveableVar] = true;
+        for (const k in t = config.hacks.spectate.camera.originalFuncStorage) {
+            utils.specCamera[k] = t[k];
+        };
+    },
+    saveCameraFuncs: function() {
+        for (const k in t = utils.specCamera) {
+            config.hacks.spectate.camera.originalFuncStorage[k] = t[k];
+        };
+    },
     resetVelocity: function() {
         for (const k in t = utils.tankOrientationVelocity) {
             (typeof t[k] == 'number') && (t[k] = 0);
@@ -170,6 +192,9 @@ var functions = {
         for (const k in t = utils.tankPositionVelocity) {
             (typeof t[k] == 'number') && (t[k] = 0);
         };
+    },
+    getRandomNumberBetween: function(min, max) {
+        return Math.random() * (max - min) + min;
     },
     getPositionOfTank: function (t) {
         return Object.values(Object.values(functions.searchInObject(t, '=== 2'))[0])[3];
@@ -253,6 +278,43 @@ var binderFuncs = {
                 config.hacks.airBreak.tank.position.z = Math.max(Object.values(mapBounds)[2], Math.min(Object.values(mapBounds)[5] + 100, config.hacks.airBreak.tank.position.z - config.hacks.airBreak.speed));
             };
         };
+    },
+    antiAim: function (myTankPos, mapBounds) {
+        myTankPos.c18_1 = functions.getRandomNumberBetween(Object.values(mapBounds)[0], Object.values(mapBounds)[3]);
+        myTankPos.d18_1 = functions.getRandomNumberBetween(Object.values(mapBounds)[1], Object.values(mapBounds)[4]);
+        myTankPos.e18_1 = config.hacks.antiAim.top ? Object.values(mapBounds)[5] : Object.values(mapBounds)[2];
+    },
+    spectate: function() {
+        const cameraYaw = utils.cameraDirection;
+        const forwardX = Math.cos(cameraYaw + Math.PI/2);
+        const forwardZ = Math.sin(cameraYaw + Math.PI/2);
+        const rightX = Math.cos(cameraYaw);
+        const rightZ = Math.sin(cameraYaw);
+        if (config.keysPressed.includes('w')) {
+            config.hacks.spectate.camera.position.x += forwardX * config.hacks.spectate.speed;
+            config.hacks.spectate.camera.position.y += forwardZ * config.hacks.spectate.speed;
+        };
+        if (config.keysPressed.includes('s')) {
+            config.hacks.spectate.camera.position.x -= forwardX * config.hacks.spectate.speed;
+            config.hacks.spectate.camera.position.y -= forwardZ * config.hacks.spectate.speed;
+        };
+        if (config.keysPressed.includes('a')) {
+            config.hacks.spectate.camera.position.x -= rightX * config.hacks.spectate.speed;
+            config.hacks.spectate.camera.position.y -= rightZ * config.hacks.spectate.speed;
+        };
+        if (config.keysPressed.includes('d')) {
+            config.hacks.spectate.camera.position.x += rightX * config.hacks.spectate.speed;
+            config.hacks.spectate.camera.position.y += rightZ * config.hacks.spectate.speed;
+        };
+        if (config.keysPressed.includes('f')) {
+            config.hacks.spectate.camera.position.z += config.hacks.spectate.speed;
+        };
+        if (config.keysPressed.includes('v')) {
+            config.hacks.spectate.camera.position.z -= config.hacks.spectate.speed;
+        };
+        utils.specCamera.c18_1 = config.hacks.spectate.camera.position.x;
+        utils.specCamera.d18_1 = config.hacks.spectate.camera.position.y;
+        utils.specCamera.e18_1 = config.hacks.spectate.camera.position.z;
     }
 };
 
@@ -272,7 +334,12 @@ var config = {
     hacks: {
         antiAim: {
             enabled: false,
-            top: false
+            top: false,
+            originalPos: {
+                x: null,
+                y: null,
+                z: null
+            }
         },
         airBreak: {
             enabled: false,
@@ -298,7 +365,16 @@ var config = {
         },
         spectate: {
             enabled: false,
-            faceTurret: false
+            faceTurret: false,
+            speed: 25,
+            camera: {
+                position: {
+                    x: null,
+                    y: null,
+                    z: null
+                },
+                originalFuncStorage: {}
+            }
         },
         neverFlip: {
             enabled: false,
@@ -370,13 +446,9 @@ var config = {
                 skin: null
             }
         },
-        spectate: {
-            enabled: false,
-            type: 'freefly',
-            player: null
-        },
         autoPress: []
     },
+    isInGame: false,
     keysPressed: []
 };
 
@@ -421,6 +493,11 @@ var utils = {
     },
     get camera() {
         return Utils.followCamera;
+    },
+    get specCamera() {
+        var first2 = functions.searchInObject(Utils.followCamera, '==1');
+        var second2 = functions.searchInObject(Object.values(first2)[3], '==43');
+        return Object.values(second2)[0];
     },
     get cameraDirectionName() {
         return Object.entries(Utils.followCamera).filter(t => typeof t[1] == 'number')[0][0];
@@ -480,15 +557,48 @@ var eventListeners = [
         type: 'keydown',
         handle: function(e) {
             if (!config.keysPressed.includes(e.key)) config.keysPressed.push(e.key);
-            if (e.shiftKey && e.location == 2) {
-                var pos = utils.tankPosition;
-                config.hacks.airBreak.tank.position = {
-                    x: pos.c18_1,
-                    y: pos.d18_1,
-                    z: pos.e18_1,
+            if (config.isInGame) {
+                if (e.shiftKey && e.location == 2) {
+                    var pos = utils.tankPosition;
+                    config.hacks.airBreak.tank.position = {
+                        x: pos.c18_1,
+                        y: pos.d18_1,
+                        z: pos.e18_1
+                    };
+                    config.hacks.airBreak.enabled = !config.hacks.airBreak.enabled;
+                    if (!config.hacks.airBreak.enabled) functions.resetVelocity();
                 };
-                config.hacks.airBreak.enabled = !config.hacks.airBreak.enabled;
-                if (!config.hacks.airBreak.enabled) functions.resetVelocity();
+                if (e.key == 'J') {
+                    if (config.hacks.antiAim.enabled) {
+                        if (config.hacks.antiAim.top) {
+                            config.hacks.antiAim.top = false;
+                        } else {
+                            config.hacks.antiAim.top = true;
+                            config.hacks.antiAim.enabled = false;
+                            var pos = utils.tankPosition;
+                            pos.c18_1 = config.hacks.antiAim.originalPos.x;
+                            pos.d18_1 = config.hacks.antiAim.originalPos.y;
+                            pos.e18_1 = config.hacks.antiAim.originalPos.z;
+                        };
+                    } else {
+                        config.hacks.antiAim.enabled = true;
+                        var pos = utils.tankPosition;
+                        config.hacks.antiAim.originalPos = {
+                            x: pos.c18_1,
+                            y: pos.d18_1,
+                            z: pos.e18_1
+                        };
+                    };
+                };
+                if (e.key == 'K') {
+                    config.hacks.spectate.enabled = !config.hacks.spectate.enabled;
+                    if (config.hacks.spectate.enabled) {
+                        functions.setSpec();
+                    } else {
+                        functions.resetSpec();
+                        functions.resetVelocity();
+                    };
+                };
             };
         }
     },
@@ -501,7 +611,7 @@ var eventListeners = [
     {
         type: 'mousemove',
         handle: function(e) {
-            if (document.pointerLockElement && config.hacks.airBreak.enabled) {
+            if (document.pointerLockElement && (config.hacks.airBreak.enabled || config.hacks.spectate.enabled)) {
                 var sensitivity = 0.0005;
                 utils.cameraElavation -= -e.movementY * sensitivity;
             };
@@ -525,11 +635,29 @@ setEventListeners();
 var animationFrameId;
 function animationFrameFunc() {
     animationFrameId = requestAnimationFrame(animationFrameFunc);
-    if (config.hacks.airBreak.enabled && Utils.cameraComponent) {
-        if (utils.tankMoveable) utils.tank[utils.tankMoveableVar] = false;
-        binderFuncs.airBreak(utils.tankPosition, utils.tankInfo, utils.mapBounds, config.target.position);
-    } else {
-        if (!utils.tankMoveable) utils.tank[utils.tankMoveableVar] = true;
+    if (!config.isInGame && document.querySelector('canvas[class]:not([class*=" "])')) {
+        config.isInGame = true;
+    };
+    if (config.isInGame && !document.querySelector('canvas[class]:not([class*=" "])')) {
+        config.isInGame = false;
+    };
+    if (config.isInGame) {
+        try {
+            if (config.hacks.airBreak.enabled && (utils.allTanks.length > 0)) {
+                if (Utils) {
+                    if (utils.tankMoveable) utils.tank[utils.tankMoveableVar] = false;
+                    binderFuncs.airBreak(utils.tankPosition, utils.tankInfo, utils.mapBounds, config.target.position);
+                };
+            } else if (!config.hacks.spectate.enabled) {
+                if (!utils.tankMoveable) utils.tank[utils.tankMoveableVar] = true;
+            };
+            if (config.hacks.antiAim.enabled) {
+                binderFuncs.antiAim(utils.tankPosition, utils.mapBounds);
+            };
+            if (config.hacks.spectate.enabled) {
+                binderFuncs.spectate();
+            };
+        } catch (e) {};
     };
 };
 try {
