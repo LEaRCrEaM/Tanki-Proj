@@ -163,6 +163,9 @@ var functions = {
             return;
         };
     },
+    specPlayer: function(nick) {
+        
+    },
     setSpec: function() {
         utils.tank[utils.tankMoveableVar] = false;
         if (Object.values(config.hacks.spectate.camera.originalFuncStorage).length == 0) {
@@ -192,6 +195,12 @@ var functions = {
         for (const k in t = utils.tankPositionVelocity) {
             (typeof t[k] == 'number') && (t[k] = 0);
         };
+    },
+    getTankYaw2: function(t) {
+        const { i1b_1, h1b_1, g1b_1, j1b_1 } = t[1];
+        const sinY = 2 * (j1b_1 * i1b_1 + g1b_1 * i1b_1);
+        const cosY = 1 - 2 * (i1b_1 * i1b_1 + g1b_1 * g1b_1);
+        return Math.atan2(sinY, cosY);
     },
     getRandomNumberBetween: function(min, max) {
         return Math.random() * (max - min) + min;
@@ -315,18 +324,29 @@ var binderFuncs = {
         utils.specCamera.c18_1 = config.hacks.spectate.camera.position.x;
         utils.specCamera.d18_1 = config.hacks.spectate.camera.position.y;
         utils.specCamera.e18_1 = config.hacks.spectate.camera.position.z;
+        if (config.hacks.spectate.type == 'player') {
+            config.hacks.spectate.camera.position.x = config.target.position.c18_1;
+            config.hacks.spectate.camera.position.y = config.target.position.d18_1;
+            config.hacks.spectate.camera.position.z = config.target.position.e18_1;
+            utils.specCamera.c18_1 = config.hacks.spectate.camera.position.x;
+            utils.specCamera.d18_1 = config.hacks.spectate.camera.position.y;
+            utils.specCamera.e18_1 = config.hacks.spectate.camera.position.z;
+            if (config.hacks.spectate.faceTurret) {
+                var player = functions.getTanks('player' + config.target.nick)[0];
+                if (player) {
+                    utils.cameraDirection = functions.getTankYaw2(functions.getInfoOfTank(player)) + utils.getTurretDirectionOfTank(player);
+                } else {
+                    config.hacks.spectate.type = 'freefly';
+                };
+            };
+        };
     }
 };
 
 var config = {
-    tank: {
-        position: {
-            x: null,
-            y: null,
-            z: null
-        }
-    },
     target: {
+        nick: '',
+        object: null,
         tank: {
             position: null
         }
@@ -367,6 +387,7 @@ var config = {
             enabled: false,
             faceTurret: false,
             speed: 25,
+            type: 'freefly',
             camera: {
                 position: {
                     x: null,
@@ -616,6 +637,23 @@ var eventListeners = [
                 utils.cameraElavation -= -e.movementY * sensitivity;
             };
         }
+    },
+    {
+        type: 'click',
+        handle: function(e) {
+            if (e.target.classList[1]?.includes('Common-whiteSpaceNoWrap')) {
+                var nick = '';
+                if (!e.target.textContent.includes(' ')) {
+                    nick = e.target.textContent;
+                } else {
+                    nick = e.target.textContent.split(' ')[1];
+                };
+                if (config.hacks.spectate.enabled) {
+                    functions.specPlayer(nick);
+                };
+                config.target.position = functions.getPositionOfTank(functions.getTanks('player' + nick)[0]);
+            };
+        };
     }
 ];
 
