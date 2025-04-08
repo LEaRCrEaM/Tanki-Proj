@@ -34,9 +34,9 @@ var functions = {
             return;
         };
         let direction = {
-            x: otherTankPos.c18_1 - myTankPos.c18_1,
-            y: otherTankPos.d18_1 - myTankPos.d18_1,
-            z: otherTankPos.e18_1 - myTankPos.e18_1
+            x: otherTankPos.f1m_1 - myTankPos.f1m_1,
+            y: otherTankPos.g1m_1 - myTankPos.g1m_1,
+            z: otherTankPos.h1m_1 - myTankPos.h1m_1
         };
         let magnitude = Math.sqrt(direction.x ** 2 + direction.y ** 2 + direction.z ** 2);
         if (magnitude < 1e-6) {
@@ -58,10 +58,10 @@ var functions = {
             y: sy * cp,
             z: -sy * sp
         };
-        myTankInfo[1].i1b_1 = -quaternion.x;
-        myTankInfo[1].h1b_1 = -quaternion.z;
-        myTankInfo[1].g1b_1 = -quaternion.y;
-        myTankInfo[1].j1b_1 = quaternion.w;
+        myTankInfo[1].l1p_1 = -quaternion.x;
+        myTankInfo[1].k1p_1 = -quaternion.z;
+        myTankInfo[1].j1p_1 = -quaternion.y;
+        myTankInfo[1].m1p_1 = quaternion.w;
         return quaternion;
     },
     updateTankOrientationToCamera: function (myTankInfo) {
@@ -74,27 +74,27 @@ var functions = {
         const sinPitch = Math.sin(halfPitch);
         const cosPitch = Math.cos(halfPitch);
         const yawQuat = {
-            g1b_1: cosYaw,
-            h1b_1: 0,
-            i1b_1: 0,
-            j1b_1: sinYaw
+            j1p_1: cosYaw,
+            k1p_1: 0,
+            l1p_1: 0,
+            m1p_1: sinYaw
         };
         const pitchQuat = {
-            g1b_1: cosPitch,
-            h1b_1: sinPitch,
-            i1b_1: 0,
-            j1b_1: 0
+            j1p_1: cosPitch,
+            k1p_1: sinPitch,
+            l1p_1: 0,
+            m1p_1: 0
         };
         const resultQuat = {
-            g1b_1: yawQuat.g1b_1 * pitchQuat.g1b_1 - yawQuat.h1b_1 * pitchQuat.h1b_1 - yawQuat.i1b_1 * pitchQuat.i1b_1 - yawQuat.j1b_1 * pitchQuat.j1b_1,
-            h1b_1: yawQuat.g1b_1 * pitchQuat.h1b_1 + yawQuat.h1b_1 * pitchQuat.g1b_1 + yawQuat.i1b_1 * pitchQuat.j1b_1 - yawQuat.j1b_1 * pitchQuat.i1b_1,
-            i1b_1: yawQuat.g1b_1 * pitchQuat.i1b_1 - yawQuat.h1b_1 * pitchQuat.j1b_1 + yawQuat.i1b_1 * pitchQuat.g1b_1 + yawQuat.j1b_1 * pitchQuat.h1b_1,
-            j1b_1: yawQuat.g1b_1 * pitchQuat.j1b_1 + yawQuat.h1b_1 * pitchQuat.i1b_1 - yawQuat.i1b_1 * pitchQuat.h1b_1 + yawQuat.j1b_1 * pitchQuat.g1b_1
+            j1p_1: yawQuat.j1p_1 * pitchQuat.j1p_1 - yawQuat.k1p_1 * pitchQuat.k1p_1 - yawQuat.l1p_1 * pitchQuat.l1p_1 - yawQuat.m1p_1 * pitchQuat.m1p_1,
+            k1p_1: yawQuat.j1p_1 * pitchQuat.k1p_1 + yawQuat.k1p_1 * pitchQuat.j1p_1 + yawQuat.l1p_1 * pitchQuat.m1p_1 - yawQuat.m1p_1 * pitchQuat.l1p_1,
+            l1p_1: yawQuat.j1p_1 * pitchQuat.l1p_1 - yawQuat.k1p_1 * pitchQuat.m1p_1 + yawQuat.l1p_1 * pitchQuat.j1p_1 + yawQuat.m1p_1 * pitchQuat.k1p_1,
+            m1p_1: yawQuat.j1p_1 * pitchQuat.m1p_1 + yawQuat.k1p_1 * pitchQuat.l1p_1 - yawQuat.l1p_1 * pitchQuat.k1p_1 + yawQuat.m1p_1 * pitchQuat.j1p_1
         };
-        myTankInfo[1].g1b_1 = resultQuat.g1b_1;
-        myTankInfo[1].h1b_1 = resultQuat.h1b_1;
-        myTankInfo[1].i1b_1 = resultQuat.i1b_1;
-        myTankInfo[1].j1b_1 = resultQuat.j1b_1;
+        myTankInfo[1].j1p_1 = resultQuat.j1p_1;
+        myTankInfo[1].k1p_1 = resultQuat.k1p_1;
+        myTankInfo[1].l1p_1 = resultQuat.l1p_1;
+        myTankInfo[1].m1p_1 = resultQuat.m1p_1;
     },
     searchInObject: function (objectToSearch, comparisonString) {
         try {
@@ -121,21 +121,21 @@ var functions = {
                 var first1 = Object.values(functions.searchInObject(Object.values(p).filter(t => t?.__proto__), '=== 15'))[0];
                 var second1 = functions.searchInObject(Object.values(first1).filter(t => t?.__proto__), '=== 18');
                 var third1 = functions.searchInObject(Object.values(Object.values(second1)[0])[0], '==8');
-                return typeof Object.values(functions.searchInObject(Object.values(third1)[2], '==0'))[2] == 'number';
+                return typeof Object.values(functions.searchInObject(Object.values(third1)[1], '==0'))[2] == 'number';
             });
         } else if (t == 'self') {
             return Object.values(utils.allTanks).filter(p => {
                 var first1 = Object.values(functions.searchInObject(Object.values(p).filter(t => t?.__proto__), '=== 15'))[0];
                 var second1 = functions.searchInObject(Object.values(first1).filter(t => t?.__proto__), '=== 18');
                 var third1 = functions.searchInObject(Object.values(Object.values(second1)[0])[0], '==8');
-                return typeof Object.values(functions.searchInObject(Object.values(third1)[2], '==0'))[2] == 'boolean';
+                return typeof Object.values(functions.searchInObject(Object.values(third1)[1], '==0'))[2] == 'boolean';
             });
         } else if (t.includes('player')) {
             return Object.values(utils.allTanks).filter(p => {
                 var first1 = Object.values(functions.searchInObject(Object.values(p).filter(t => t?.__proto__), '=== 15'))[0];
                 var second1 = functions.searchInObject(Object.values(first1).filter(t => t?.__proto__), '=== 18');
                 var third1 = functions.searchInObject(Object.values(Object.values(second1)[0])[0], '==8');
-                return Object.values(functions.searchInObject(Object.values(third1)[2], '==0'))[1]?.toString()?.includes(t.replace('player', ''));
+                return Object.values(functions.searchInObject(Object.values(third1)[1], '==0'))[1]?.toString()?.includes(t.replace('player', ''));
             });
         } else if (t.includes('enemies')) {
             return Object.values(utils.allTanks).filter(p => {
@@ -144,7 +144,7 @@ var functions = {
                 var third1 = functions.searchInObject(Object.values(Object.values(second1)[0])[0], '==8');
                 var fourth1;
                 try {
-                    fourth1 = Object.values(Object.values(functions.searchInObject(Object.values(third1)?.[2], '==1'))?.[2])?.[0] == 'ENEMY';
+                    fourth1 = Object.values(Object.values(functions.searchInObject(Object.values(third1)?.[1], '==1'))?.[2])?.[0] == 'ENEMY';
                 } catch (e){};
                 if (fourth1) return fourth1;
             });
@@ -155,7 +155,7 @@ var functions = {
                 var third1 = functions.searchInObject(Object.values(Object.values(second1)[0])[0], '==8');
                 var fourth1;
                 try {
-                    fourth1 = Object.values(Object.values(functions.searchInObject(Object.values(third1)?.[2], '==1'))?.[2])?.[0] == 'ALLY';
+                    fourth1 = Object.values(Object.values(functions.searchInObject(Object.values(third1)?.[1], '==1'))?.[2])?.[0] == 'ALLY';
                 } catch (e){};
                 if (fourth1) return fourth1;
             });
@@ -197,9 +197,9 @@ var functions = {
         };
     },
     getTankYaw2: function(t) {
-        const { i1b_1, h1b_1, g1b_1, j1b_1 } = t[1];
-        const sinY = 2 * (j1b_1 * i1b_1 + g1b_1 * i1b_1);
-        const cosY = 1 - 2 * (i1b_1 * i1b_1 + g1b_1 * g1b_1);
+        const { l1p_1, k1p_1, j1p_1, m1p_1 } = t[1];
+        const sinY = 2 * (m1p_1 * l1p_1 + j1p_1 * l1p_1);
+        const cosY = 1 - 2 * (l1p_1 * l1p_1 + j1p_1 * j1p_1);
         return Math.atan2(sinY, cosY);
     },
     getRandomNumberBetween: function(min, max) {
@@ -229,10 +229,10 @@ var binderFuncs = {
             return;
         };
         if (config.hacks.airBreak.type == 'tilt') {
-            myTankPos.c18_1 = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x));
-            myTankPos.d18_1 = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y));
+            myTankPos.f1m_1 = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x));
+            myTankPos.g1m_1 = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y));
         };
-        myTankPos.e18_1 = Math.max(Object.values(mapBounds)[2], Math.min(Object.values(mapBounds)[5] + 100, config.hacks.airBreak.tank.position.z));
+        myTankPos.h1m_1 = Math.max(Object.values(mapBounds)[2], Math.min(Object.values(mapBounds)[5] + 100, config.hacks.airBreak.tank.position.z));
         if (config.hacks.airBreak.faceTarget && otherTankPos) {
             functions.faceTargetQuaternion(myTankPos, otherTankPos, myTankInfo);
         } else {
@@ -247,8 +247,8 @@ var binderFuncs = {
                     config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x + forwardX * config.hacks.airBreak.speed));
                     config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y + forwardZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
-                    myTankInfo[0].c18_1 += forwardX * 1000;
-                    myTankInfo[0].d18_1 += forwardZ * 1000;
+                    myTankInfo[0].f1m_1 += forwardX * 1000;
+                    myTankInfo[0].g1m_1 += forwardZ * 1000;
                 };
             }
             if (config.keysPressed.includes('s')) {
@@ -256,8 +256,8 @@ var binderFuncs = {
                     config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x - forwardX * config.hacks.airBreak.speed));
                     config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y - forwardZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
-                    myTankInfo[0].c18_1 -= forwardX * 1000;
-                    myTankInfo[0].d18_1 -= forwardZ * 1000;
+                    myTankInfo[0].f1m_1 -= forwardX * 1000;
+                    myTankInfo[0].g1m_1 -= forwardZ * 1000;
                 };
             };
             const rightX = Math.cos(cameraYaw);
@@ -267,8 +267,8 @@ var binderFuncs = {
                     config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x + rightX * config.hacks.airBreak.speed));
                     config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y + rightZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
-                    myTankInfo[0].c18_1 += rightX * 1000;
-                    myTankInfo[0].d18_1 += rightZ * 1000;
+                    myTankInfo[0].f1m_1 += rightX * 1000;
+                    myTankInfo[0].g1m_1 += rightZ * 1000;
                 };
             };
             if (config.keysPressed.includes('a')) {
@@ -276,8 +276,8 @@ var binderFuncs = {
                     config.hacks.airBreak.tank.position.x = Math.max(Object.values(mapBounds)[0], Math.min(Object.values(mapBounds)[3], config.hacks.airBreak.tank.position.x - rightX * config.hacks.airBreak.speed));
                     config.hacks.airBreak.tank.position.y = Math.max(Object.values(mapBounds)[1], Math.min(Object.values(mapBounds)[4], config.hacks.airBreak.tank.position.y - rightZ * config.hacks.airBreak.speed));
                 } else if (config.hacks.airBreak.type == 'airWalk') {
-                    myTankInfo[0].c18_1 -= rightX * 1000;
-                    myTankInfo[0].d18_1 -= rightZ * 1000;
+                    myTankInfo[0].f1m_1 -= rightX * 1000;
+                    myTankInfo[0].g1m_1 -= rightZ * 1000;
                 };
             };
             if (config.keysPressed.includes('f')) {
@@ -289,9 +289,9 @@ var binderFuncs = {
         };
     },
     antiAim: function (myTankPos, mapBounds) {
-        myTankPos.c18_1 = functions.getRandomNumberBetween(Object.values(mapBounds)[0], Object.values(mapBounds)[3]);
-        myTankPos.d18_1 = functions.getRandomNumberBetween(Object.values(mapBounds)[1], Object.values(mapBounds)[4]);
-        myTankPos.e18_1 = config.hacks.antiAim.top ? Object.values(mapBounds)[5] : Object.values(mapBounds)[2];
+        myTankPos.f1m_1 = functions.getRandomNumberBetween(Object.values(mapBounds)[0], Object.values(mapBounds)[3]);
+        myTankPos.g1m_1 = functions.getRandomNumberBetween(Object.values(mapBounds)[1], Object.values(mapBounds)[4]);
+        myTankPos.h1m_1 = config.hacks.antiAim.top ? Object.values(mapBounds)[5] : Object.values(mapBounds)[2];
     },
     spectate: function() {
         const cameraYaw = utils.cameraDirection;
@@ -321,16 +321,16 @@ var binderFuncs = {
         if (config.keysPressed.includes('v')) {
             config.hacks.spectate.camera.position.z -= config.hacks.spectate.speed;
         };
-        utils.specCamera.c18_1 = config.hacks.spectate.camera.position.x;
-        utils.specCamera.d18_1 = config.hacks.spectate.camera.position.y;
-        utils.specCamera.e18_1 = config.hacks.spectate.camera.position.z;
+        utils.specCamera.f1m_1 = config.hacks.spectate.camera.position.x;
+        utils.specCamera.g1m_1 = config.hacks.spectate.camera.position.y;
+        utils.specCamera.h1m_1 = config.hacks.spectate.camera.position.z;
         if (config.hacks.spectate.type == 'player') {
-            config.hacks.spectate.camera.position.x = config.target.position.c18_1;
-            config.hacks.spectate.camera.position.y = config.target.position.d18_1;
-            config.hacks.spectate.camera.position.z = config.target.position.e18_1;
-            utils.specCamera.c18_1 = config.hacks.spectate.camera.position.x;
-            utils.specCamera.d18_1 = config.hacks.spectate.camera.position.y;
-            utils.specCamera.e18_1 = config.hacks.spectate.camera.position.z;
+            config.hacks.spectate.camera.position.x = config.target.position.f1m_1;
+            config.hacks.spectate.camera.position.y = config.target.position.g1m_1;
+            config.hacks.spectate.camera.position.z = config.target.position.h1m_1;
+            utils.specCamera.f1m_1 = config.hacks.spectate.camera.position.x;
+            utils.specCamera.g1m_1 = config.hacks.spectate.camera.position.y;
+            utils.specCamera.h1m_1 = config.hacks.spectate.camera.position.z;
             if (config.hacks.spectate.faceTurret) {
                 var player = functions.getTanks('player' + config.target.nick)[0];
                 if (player) {
@@ -582,9 +582,9 @@ var eventListeners = [
                 if (e.shiftKey && e.location == 2) {
                     var pos = utils.tankPosition;
                     config.hacks.airBreak.tank.position = {
-                        x: pos.c18_1,
-                        y: pos.d18_1,
-                        z: pos.e18_1
+                        x: pos.f1m_1,
+                        y: pos.g1m_1,
+                        z: pos.h1m_1
                     };
                     config.hacks.airBreak.enabled = !config.hacks.airBreak.enabled;
                     if (!config.hacks.airBreak.enabled) functions.resetVelocity();
@@ -597,17 +597,17 @@ var eventListeners = [
                             config.hacks.antiAim.top = true;
                             config.hacks.antiAim.enabled = false;
                             var pos = utils.tankPosition;
-                            pos.c18_1 = config.hacks.antiAim.originalPos.x;
-                            pos.d18_1 = config.hacks.antiAim.originalPos.y;
-                            pos.e18_1 = config.hacks.antiAim.originalPos.z;
+                            pos.f1m_1 = config.hacks.antiAim.originalPos.x;
+                            pos.g1m_1 = config.hacks.antiAim.originalPos.y;
+                            pos.h1m_1 = config.hacks.antiAim.originalPos.z;
                         };
                     } else {
                         config.hacks.antiAim.enabled = true;
                         var pos = utils.tankPosition;
                         config.hacks.antiAim.originalPos = {
-                            x: pos.c18_1,
-                            y: pos.d18_1,
-                            z: pos.e18_1
+                            x: pos.f1m_1,
+                            y: pos.g1m_1,
+                            z: pos.h1m_1
                         };
                     };
                 };
