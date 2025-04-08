@@ -517,7 +517,7 @@ var utils = {
     },
     get specCamera() {
         var first2 = functions.searchInObject(Utils.followCamera, '==1');
-        var second2 = functions.searchInObject(Object.values(first2)[3], '==43');
+        var second2 = functions.searchInObject(Object.values(first2)[3], '>43');
         return Object.values(second2)[0];
     },
     get cameraDirectionName() {
