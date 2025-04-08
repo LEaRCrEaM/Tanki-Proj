@@ -653,7 +653,7 @@ var eventListeners = [
                 };
                 config.target.position = functions.getPositionOfTank(functions.getTanks('player' + nick)[0]);
             };
-        };
+        }
     }
 ];
 
