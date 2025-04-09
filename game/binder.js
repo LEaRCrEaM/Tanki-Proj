@@ -163,8 +163,44 @@ var functions = {
             return;
         };
     },
+    unsetMainHacks() {
+        config.hacks.airBreak.enabled = false;
+        config.hacks.antiAim.enabled = false;
+        config.hacks.spectate.enabled = false;
+        config.hacks.airBreak.tank.position = {
+            x: null,
+            y: null,
+            z: null
+        };
+    },
+    setTarget(nick) {
+        config.target.object = functions.getTanks(`player${nick}`);
+        if (config.target.object[0]) {
+            config.target.tank.position = functions.getPositionOfTank(config.target.object[0]);
+            config.target.nick = nick;
+        } else {
+            functions.unsetTarget();
+            console.log('target not found');
+        };
+    },
+    unsetTarget() {
+        config.target = {
+            nick: '',
+            object: null,
+            tank: {
+                position: null
+            }
+        };
+    },
+    updateAimAssist() {
+        if (utils.aimAssistObject) {
+            utils.aimAssistAngleAmount[utils.aimAssistAngleAmountVar] = config.hacks.aimAssist.amount;
+            utils.aimAssistStepAmount[utils.aimAssistStepAmount] = utils.aimAssistStepAmount[utils.aimAssistStepAmount] == 0 ? 0.0034906584520148633 : utils.aimAssistStepAmount[utils.aimAssistStepAmount];
+            config.hacks.aimAssist.prevAmount = config.hacks.aimAssist.amount;
+        }
+    },
     specPlayer: function(nick) {
-        
+        config.hacks.spectate.type = 'player';
     },
     setSpec: function() {
         utils.tank[utils.tankMoveableVar] = false;
@@ -176,6 +212,52 @@ var functions = {
                 t[k] = function() {};
             };
         };
+    },
+    setHitbox() {
+        enemies.forEach(e => {
+            var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(e, '==14'))[0], '==3'))[0], '>43'))[0];
+            if (body.scaled) return;
+            for (const k in body) {
+                if (typeof body[k] == 'number') {
+                    body[k] *= config.hacks.hitbox.amount;
+                };
+            };
+            body.scaled = true;
+        });
+    },
+    resetHitbox() {
+        enemies.forEach(e => {
+            var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(e, '==14'))[0], '==3'))[0], '>43'))[0];
+            if (!body.scaled) return;
+            for (const k in body) {
+                if (typeof body[k] == 'number') {
+                    body[k] /= config.hacks.hitbox.amount;
+                };
+            };
+            body.scaled = false;
+        });
+    },
+    setNoClip() {
+        var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(utils.tank, '==14'))[0], '==3'))[0], '>43'))[0];
+        if (!body) return;
+        if (body.scaled) return;
+        for (const k in body) {
+            if (typeof body[k] == 'number') {
+                body[k] = 0;
+            };
+        };
+        body.scaled = true;
+    },
+    resetNoClip() {
+        var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(utils.tank, '==14'))[0], '==3'))[0], '>43'))[0];
+        if (!body) return;
+        if (!body.scaled) return;
+        for (const k in body) {
+            if (typeof body[k] == 'number') {
+                //body[k] = 0;
+            };
+        };
+        body.scaled = false;
     },
     resetSpec: function() {
         utils.tank[utils.tankMoveableVar] = true;
@@ -325,20 +407,39 @@ var binderFuncs = {
         utils.specCamera.g1m_1 = config.hacks.spectate.camera.position.y;
         utils.specCamera.h1m_1 = config.hacks.spectate.camera.position.z;
         if (config.hacks.spectate.type == 'player') {
-            config.hacks.spectate.camera.position.x = config.target.position.f1m_1;
-            config.hacks.spectate.camera.position.y = config.target.position.g1m_1;
-            config.hacks.spectate.camera.position.z = config.target.position.h1m_1;
+            config.hacks.spectate.camera.position.x = config.target.tank.position.f1m_1;
+            config.hacks.spectate.camera.position.y = config.target.tank.position.g1m_1;
+            config.hacks.spectate.camera.position.z = config.target.tank.position.h1m_1;
             utils.specCamera.f1m_1 = config.hacks.spectate.camera.position.x;
             utils.specCamera.g1m_1 = config.hacks.spectate.camera.position.y;
             utils.specCamera.h1m_1 = config.hacks.spectate.camera.position.z;
             if (config.hacks.spectate.faceTurret) {
-                var player = functions.getTanks('player' + config.target.nick)[0];
-                if (player) {
+                if (config.target.object[0]) {
                     utils.cameraDirection = functions.getTankYaw2(functions.getInfoOfTank(player)) + utils.getTurretDirectionOfTank(player);
                 } else {
                     config.hacks.spectate.type = 'freefly';
                 };
             };
+        };
+    },
+    hitbox: function() {
+        if (config.hacks.hitbox.enabled) {
+            functions.setHitbox();
+        };
+    },
+    noClip: function() {
+        if (config.hacks.noClip.enabled) {
+            functions.setNoClip();
+        };
+    },
+    aimAssist: function() {
+        if (config.hacks.aimAssist.enabled && !Aimbot) {
+            Aimbot = true;
+        } else if (!config.hacks.aimAssist.enabled && Aimbot) {
+            Aimbot = false;
+        };
+        if (config.hacks.aimAssist.enabled) {
+            functions.updateAimAssist();
         };
     }
 };
@@ -354,7 +455,7 @@ var config = {
     hacks: {
         antiAim: {
             enabled: false,
-            top: false,
+            top: true,
             originalPos: {
                 x: null,
                 y: null,
@@ -429,7 +530,8 @@ var config = {
         },
         aimAssist: {
             enabled: false,
-            amount: 16
+            amount: 16,
+            prevAmount: null
         },
         verticalAim: {
             enabled: false
@@ -502,6 +604,21 @@ var utils = {
     },
     get tankQuaternions() {
         return utils.tankInfo[1];
+    },
+    get aimAssistObject() {
+        if (AIM) return AIM;
+    },
+    get aimAssistAngleAmountVar() {
+        return Object.keys(Object.values(functions.searchInObject(utils.aimAssistObject, '==3'))[0])[0];
+    },
+    get aimAssistStepAmountVar() {
+        return Object.keys(Object.values(functions.searchInObject(utils.aimAssistObject, '==3'))[0])[1];
+    },
+    get aimAssistAngleAmount() {
+        return Object.values(functions.searchInObject(utils.aimAssistObject, '==3'))[0];
+    },
+    get aimAssistStepAmount() {
+        return Object.values(functions.searchInObject(utils.aimAssistObject, '==3'))[0];
     },
     get shells() {
         return Object.entries(Object.values(functions.searchInObject(Utils.gunParamsCalculator, '==19'))[0]).filter(t => typeof t[1] == 'object')[0][1];
@@ -651,7 +768,10 @@ var eventListeners = [
                 if (config.hacks.spectate.enabled) {
                     functions.specPlayer(nick);
                 };
-                config.target.position = functions.getPositionOfTank(functions.getTanks('player' + nick)[0]);
+                functions.setTarget(nick);
+                if (config.target.object[0] == utils.tank) {
+                    functions.unsetTarget();
+                };
             };
         }
     }
@@ -678,6 +798,7 @@ function animationFrameFunc() {
     };
     if (config.isInGame && !document.querySelector('canvas[class]:not([class*=" "])')) {
         config.isInGame = false;
+        functions.unsetMainHacks();
     };
     if (config.isInGame) {
         try {
@@ -705,6 +826,13 @@ try {
     cancelAnimationFrame(animationFrameId);
 };
 
+var intervalId = setInterval(() => {
+    binderFuncs.aimAssist();
+    binderFuncs.hitbox();
+    binderFuncs.noClip();
+}, 2000);
+
 function getTanks(t) {
     return functions.getTanks(t);
 };
+var searchInObject = functions.searchInObject;
