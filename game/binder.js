@@ -195,7 +195,7 @@ var functions = {
     updateAimAssist() {
         if (utils.aimAssistObject) {
             utils.aimAssistAngleAmount[utils.aimAssistAngleAmountVar] = config.hacks.aimAssist.amount;
-            utils.aimAssistStepAmount[utils.aimAssistStepAmount] = utils.aimAssistStepAmount[utils.aimAssistStepAmount] == 0 ? 0.0034906584520148633 : utils.aimAssistStepAmount[utils.aimAssistStepAmount];
+            utils.aimAssistStepAmount[utils.aimAssistStepAmountVar] = utils.aimAssistStepAmount[utils.aimAssistStepAmountVar] == 0 ? 0.0034906584520148633 : utils.aimAssistStepAmount[utils.aimAssistStepAmountVar];
             config.hacks.aimAssist.prevAmount = config.hacks.aimAssist.amount;
         }
     },
