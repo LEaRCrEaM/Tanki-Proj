@@ -213,7 +213,7 @@ var functions = {
             };
         };
     },
-    setHitbox() {
+    setHitbox: function() {
         enemies.forEach(e => {
             var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(e, '==14'))[0], '==3'))[0], '>43'))[0];
             if (body.scaled) return;
@@ -225,7 +225,7 @@ var functions = {
             body.scaled = true;
         });
     },
-    resetHitbox() {
+    resetHitbox: function() {
         enemies.forEach(e => {
             var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(e, '==14'))[0], '==3'))[0], '>43'))[0];
             if (!body.scaled) return;
@@ -237,7 +237,7 @@ var functions = {
             body.scaled = false;
         });
     },
-    setNoClip() {
+    setNoClip: function() {
         var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(utils.tank, '==14'))[0], '==3'))[0], '>43'))[0];
         if (!body) return;
         if (body.scaled) return;
@@ -248,7 +248,7 @@ var functions = {
         };
         body.scaled = true;
     },
-    resetNoClip() {
+    resetNoClip: function() {
         var body = Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(utils.tank, '==14'))[0], '==3'))[0], '>43'))[0];
         if (!body) return;
         if (!body.scaled) return;
@@ -581,7 +581,7 @@ var utils = {
     },
     get allTanks() {
         if (!Utils.cameraComponent) return;
-        var t = Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Utils.cameraComponent, '==15'))[0], '==65'))[0], '==21'))[0], '==18'))[0])[0];
+        var t = Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Object.values(functions.searchInObject(Utils.cameraComponent, '==15'))[0], '>50'))[0], '==21'))[0], '==18'))[0])[0];
         for (let i=0;i<t.length;i++) {
             t[i].espInfo = Object.values(functions.searchInObject(Object.values(Object.values(functions.searchInObject(Object.values(functions.searchInObject(t[i], '==15'))[0], '==18'))[0])[0], '==2'))[0]
         };
@@ -802,7 +802,7 @@ function animationFrameFunc() {
     };
     if (config.isInGame) {
         try {
-            if (config.hacks.airBreak.enabled && (utils.allTanks.length > 0)) {
+            if (config.hacks.airBreak.enabled && (allies.concat(enemies).length > 0)) {
                 if (Utils) {
                     if (utils.tankMoveable) utils.tank[utils.tankMoveableVar] = false;
                     binderFuncs.airBreak(utils.tankPosition, utils.tankInfo, utils.mapBounds, config.target.position);
